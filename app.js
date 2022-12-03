@@ -18,8 +18,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// https://stackoverflow.com/questions/5710358/how-to-access-post-form-fields-in-express
-
 app.get("/", (req, res) => {
     res.render("home", {
 		homeContent: homeStartingContent,
