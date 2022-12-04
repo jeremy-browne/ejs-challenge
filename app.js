@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
+const _ = require("lodash");
 const port = 3000;
 const posts = [];
 
@@ -17,45 +18,72 @@ app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+app.use((req, res, next) => {
+    console.log("Time:", new Date(), req.method, req.originalUrl);
+    next();
+});
 
 app.get("/", (req, res) => {
     res.render("home", {
-		homeContent: homeStartingContent,
-		posts: posts
-	});
+        homeContent: homeStartingContent,
+        posts: posts,
+    });
 });
 
 app.get("/about", (req, res) => {
     res.render("about", {
-		aboutContent: aboutContent
-	});
+        aboutContent: aboutContent,
+    });
 });
 
 app.get("/contact", (req, res) => {
     res.render("contact", {
-		contactContent: contactContent
-	});
+        contactContent: contactContent,
+    });
 });
 
 app.get("/contact", (req, res) => {
     res.render("contact", {
-		contactContent: contactContent
-	});
+        contactContent: contactContent,
+    });
 });
 
 app.get("/compose", (req, res) => {
     res.render("compose", {
-		contactContent: contactContent
-	});
+        contactContent: contactContent,
+    });
 });
 
 app.post("/compose", (req, res) => {
-	const post = {
-		postTitle : req.body.postTitle,
-		postContent : req.body.postContent
-	};
-	posts.push(post);
-	res.redirect("/");
+    const post = {
+        postTitle: req.body.postTitle,
+		postTitleLower: _.kebabCase(_.lowerCase(req.body.postTitle)),
+        postContent: req.body.postContent,
+		postPreview: _.truncate(req.body.postContent, {
+			"length": 150,
+			"omission": "..."
+		})
+    };
+    posts.push(post);
+    res.redirect("/");
+});
+
+app.get("/posts/:postName", (req, res) => {
+	let postName = _.lowerCase(req.params.postName);
+	let result = posts.filter(obj => { 
+		return _.lowerCase(obj.postTitle) === postName
+	});
+
+	if (result.length >= 1) {
+		console.log("Matching post found! Name:", result[0].postTitle);
+		res.render("post", {
+			postTitle: result[0].postTitle,
+			postContent: result[0].postContent
+		});
+	} else {
+		console.log("No match found for postName:", postName);
+		res.redirect("/");
+	}
 });
 
 app.listen(port, function () {

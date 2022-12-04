@@ -5,8 +5,9 @@
 <p><%= homeContent %></p>
 
 <% posts.forEach((item) => { %>
-    <h1><%= item.postTitle %></h1>
-    <p><%= item.postContent %></p>
+    <h2><a href="/posts/<%= item.postTitleLower %>"><%= item.postTitle %></a></h2>
+    <p><%= item.postPreview %></p>
+    <a class="readMore text-right" href="/posts/<%= item.postTitleLower %>">Read More</a>
 <% }) %>
 
 <%- include("partials/footer"); %> 
